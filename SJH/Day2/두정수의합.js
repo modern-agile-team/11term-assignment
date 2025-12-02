@@ -3,11 +3,11 @@ function solution(a, b) {
 
     if (a < b) {
         for (let i = a; i <= b; i++) {
-            answer = answer + i;
+            answer += i;
         }
     } else {
         for (let i = b; i <= a; i++) {
-            answer = answer + i;
+            answer += i;
         }
     }
 
