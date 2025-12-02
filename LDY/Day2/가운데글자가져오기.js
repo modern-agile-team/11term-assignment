@@ -1,7 +1,9 @@
 function solution(s) {
+  const midIndex = Math.floor(s.length / 2);
+
   if (s.length % 2 === 0) {
-    return s.substr(Math.floor(s.length / 2) - 1, 2);
+    return s.substr(midIndex - 1, 2);
   } else {
-    return s[Math.floor(s.length / 2)];
+    return s[midIndex];
   }
 }
