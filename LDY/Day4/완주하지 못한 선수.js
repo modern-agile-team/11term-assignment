@@ -1,5 +1,5 @@
 function solution(participant, completion) {
-  const result = new Object();
+  const result = {};
 
   mergeRunner(result, participant);
   mergeRunner(result, completion);

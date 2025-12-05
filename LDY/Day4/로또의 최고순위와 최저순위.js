@@ -1,5 +1,5 @@
 function solution(lottos, win_nums) {
-  let correctCounts = [0, 0];
+  const correctCounts = [0, 0];
 
   for (let i = 0; i < lottos.length; i++) {
     const currentLottoNum = lottos[i];
@@ -15,22 +15,16 @@ function solution(lottos, win_nums) {
     switch (correctCount) {
       case 6:
         return 1;
-        break;
       case 5:
         return 2;
-        break;
       case 4:
         return 3;
-        break;
       case 3:
         return 4;
-        break;
       case 2:
         return 5;
-        break;
       default:
         return 6;
-        break;
     }
   });
 }
