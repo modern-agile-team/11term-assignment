@@ -9,5 +9,5 @@ function solution(absolutes, signs) {
   return result;
 
   // reduce 응용
-  return absolutes.reduce((a, c, i) => a + (signs[i] ? absolutes[i] : -absolutes[i]), 0);
+  return absolutes.reduce((sum, _, index) => sum + (signs[index] ? absolutes[index] : -absolutes[index]), 0);
 }
