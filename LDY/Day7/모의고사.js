@@ -1,12 +1,12 @@
 function solution(answers) {
-    const patterns = [
+    const NUMBER_PATTERNS = [
         [1,2,3,4,5],
         [2,1,2,3,2,4,2,5],
         [3,3,1,1,2,2,4,4,5,5]
     ];
     const correctCountArr = [0, 0, 0];
     
-    for(const [patternIndex, pattern] of patterns.entries()) {
+    for(const [patternIndex, pattern] of NUMBER_PATTERNS.entries()) {
         for(const [answerIndex, answer] of answers.entries()) {          
             const qustionIndex = answerIndex % pattern.length;
             if(answer === pattern[qustionIndex]) {
