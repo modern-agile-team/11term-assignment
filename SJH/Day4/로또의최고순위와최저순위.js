@@ -1,21 +1,21 @@
 function solution(lottos, win_nums) {
-    let a = 0;  
-    let b = 0;   
+    let digits = 0;  
+    let question = 0;   
     for (i = 0; i < 6; i++){
         if (lottos[i] === 0){
-            a++;
+            digits++;
         } else {
             for (let j = 0; j < 6; j++){
                 if (lottos[i] === win_nums[j])
-                b++;
+                question++;
             }
         }
     }
-    let c = a + b;
-    let d = b;   
-    let r = [6, 6, 5, 4, 3, 2, 1];
+    const best = digits + question;
+    const worst = question;   
+    const rank = [6, 6, 5, 4, 3, 2, 1];
 
-    return [r[c], r[d]];
+    return [rank[best], rank[worst]];
 }
 
    

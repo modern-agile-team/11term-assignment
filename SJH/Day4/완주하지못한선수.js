@@ -1,5 +1,5 @@
 function solution(participant, completion) {
-    let answer = {};
+    const answer = {};
     for (let name of participant) {
         answer[name] = (answer[name] || 0) + 1; 
     }

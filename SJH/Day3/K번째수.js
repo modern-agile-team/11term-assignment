@@ -6,9 +6,8 @@ function solution( array, commands ) {
 
         let cut = array.slice( i - 1, j);
          
-        cut.sort (function(a, b){
-            return a - b;
-        });
+        cut.sort((a, b) => a - b);
+
         let result = cut[k - 1];
          
         answer.push(result);
