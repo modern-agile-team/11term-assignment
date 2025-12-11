@@ -1,4 +1,6 @@
 function solution(new_id) {
+  const MAX_LENGTH = 15;
+  const MIN_LENGTH = 3;
   // 1단계 : 대문자 치환
   let result = new_id.toLowerCase();
   
@@ -15,12 +17,12 @@ function solution(new_id) {
   result = result || "a";
   
   // 6단계 : 문자 길이가 16자 이상이면 15자로 변경, 변경 후 끝 문자가 마침표이면 제거
-  if(result.length > 15) {
+  if(result.length > MAX_LENGTH) {
     result = result.substr(0, 15).replace(/\.$/, "");
   }
   
   // 7단계 : 문자 길이가 2자 이하이면 3자로 변경
-  if(result.length < 3) {
+  if(result.length < MIN_LENGTH) {
     result = result.padEnd(3, result[result.length - 1]);
   }
   
