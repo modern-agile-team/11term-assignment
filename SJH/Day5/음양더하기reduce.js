@@ -1,13 +1,13 @@
 function solution(absolutes, signs) {
-    const answer = absolutes.reduce((plus, ij, index) => {
-        const ji = signs[index];   
-        let realji;                
-        if (ji === true) {         
-            realji = ij;
+    const answer = absolutes.reduce((plus, iJ, index) => {
+        const Ji = signs[index];   
+        let realJi;                
+        if (jI) {         
+            realJi = iJ;
         } else {                   
-            realji = -ij;
+            realJi = -iJ;
         }
-        return plus + realji;      
+        return plus + realJi;      
     }, 0);   
     return answer;
 }

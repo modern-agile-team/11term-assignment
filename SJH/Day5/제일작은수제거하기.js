@@ -2,12 +2,8 @@ function solution(arr) {
     if (arr.length === 1) {
         return [-1];
     }
-    const small = Math.min (...arr);
-    const smalldex = arr.indexOf (small);
-    arr.splice (smalldex, 1);
-    if (arr.length === 0) {
-        return [-1];
-    } else {
-        return arr;
-    }
+    const minValue = Math.min (...arr);
+    const minValueDex = arr.indexOf (minValue);
+    arr.splice (minValueDex, 1);
+    return arr;
 }
