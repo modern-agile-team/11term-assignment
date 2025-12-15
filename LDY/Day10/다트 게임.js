@@ -1,3 +1,5 @@
+const POW = { S: 1, D: 2, T: 3 };
+
 function solution(dartResult) {
   const parsedScores = parseScore(dartResult);
   const calculatedScores = [];
@@ -28,7 +30,6 @@ function splitScore(baseScore) {
 
 // 각 보너스별로 점수에 제곱을 해주고 반환
 function calculateScore(score, bonus) {
-  const POW = { S: 1, D: 2, T: 3 };
   return score ** POW[bonus]; 
 }
 
