@@ -11,7 +11,7 @@ function solution(N, stages) {
     remainingPeople -= failer;
   }
     
-  return sortFailRate(failRates);
+  return getSortedStageIds(failRates).map(item => item.stage);
 }
 
 function pushFailRate(failRates, stage, rate) {
@@ -22,8 +22,6 @@ function filterFailer(users, index) {
   return users.filter(user => user === index+1).length;
 }
 
-function sortFailRate(failRate) {
-  return failRate
-      .sort((a, b) => (b.rate - a.rate))
-      .map(value => value.stage);
+function getSortedStageIds(failRate) {
+  return failRate.sort((a, b) => (b.rate - a.rate));
 }
