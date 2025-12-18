@@ -6,7 +6,7 @@ function solution(N, stages) {
     const failer = filterFailer(stages, i);
     const rate = failer/remainingPeople;
     
-    addFailRate(failRates, i, rate);
+    pushFailRate(failRates, i, rate);
     
     remainingPeople -= failer;
   }
@@ -14,7 +14,7 @@ function solution(N, stages) {
   return sortFailRate(failRates);
 }
 
-function addFailRate(failRates, stage, rate) {
+function pushFailRate(failRates, stage, rate) {
   failRates.push({stage: stage+1, rate});
 }
 
