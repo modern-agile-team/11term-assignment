@@ -1,14 +1,14 @@
 function solution(N, stages) {
   const failRates = [];
-  let remainingPeople = stages.length;
+  let remainingUsers = stages.length;
   
   for (let i = 0; i < N; i++) {
-    const failer = filterFailer(stages, i);
-    const rate = failer/remainingPeople;
+    const failedUsersCount = getFailedUserCount(stages, i);
+    const rate = failedUsersCount/remainingUsers;
     
     pushFailRate(failRates, i, rate);
     
-    remainingPeople -= failer;
+    remainingUsers -= failedUsersCount;
   }
     
   return getSortedStageIds(failRates).map(item => item.stage);
@@ -18,7 +18,7 @@ function pushFailRate(failRates, stage, rate) {
   failRates.push({stage: stage+1, rate});
 }
 
-function filterFailer(users, index) {
+function getFailedUserCount(users, index) {
   return users.filter(user => user === index+1).length;
 }
 
