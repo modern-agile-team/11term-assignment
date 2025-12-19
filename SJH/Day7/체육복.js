@@ -2,7 +2,7 @@ function solution(n, lost, reserve) {
     lost.sort((a, b) => a - b);
     reserve.sort((a, b) => a - b);
     let participation = n - lost.length;
-    const LostSet = new Set(lost);
+    const lostSet = new Set(lost);
     for (let i = 0; i < reserve.length; i++) {
         if (LostSet.has(reserve[i])) {
             participation++;

@@ -1,5 +1,5 @@
 function solution(answers) {
-    let answer = [];
+    const answer = [];
     const pattern1 = [1, 2, 3, 4, 5];
     const pattern2 = [2, 1, 2, 3, 2, 4, 2, 5];
     const pattern3 = [3, 3, 1, 1, 2, 2, 4, 4, 5, 5];
@@ -17,7 +17,7 @@ function solution(answers) {
             score3++;
         }
     }
-    let maxScore = Math.max(score1, score2, score3);
+    const maxScore = Math.max(score1, score2, score3);
     if (score1 === maxScore) {
         answer.push(1);
     }
