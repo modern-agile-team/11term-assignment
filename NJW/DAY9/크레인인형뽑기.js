@@ -1,5 +1,5 @@
 function solution(board, moves) {
-    let stack = [];
+    const stack = [];
     var answer = 0;
 
     // move 인덱스를 불러와서
@@ -9,10 +9,10 @@ function solution(board, moves) {
         // 반복문을 통해 board를 가지고와서
         for (let i = 0; i < board.length; i++) {
             // 만약에 board에 x y 좌표가 0이 아니면
-            if (board[i][cols] != 0) {
+            if (board[i][cols] !== 0) {
                 // 스택에서 중복되는 값들 제거
                 if (
-                    (stack.length > 0 && stack[stack.length - 1]) ==
+                    (stack.length > 0 && stack[stack.length - 1]) ===
                     board[i][cols]
                 ) {
                     // 중복되면 2점씩 추가
