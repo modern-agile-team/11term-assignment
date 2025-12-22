@@ -18,8 +18,8 @@ function addUserList(records, userList) {
 function addMessageList(records, userList) {
   const messageList = [];
   
-  for (const message of records) {
-    const [status, uid] = splitMessage(message);
+  for (const record of records) {
+    const [status, uid] = splitMessage(record);
     if (status === "Enter")
       messageList.push(`${userList[uid]}님이 들어왔습니다.`);
     else if (status === "Leave")
