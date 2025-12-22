@@ -7,7 +7,7 @@ function solution(s) {
 
 function addSetOfNumber(sortedSetList) {
   const tuple = new Set();
-  for (set of sortedSetList) {
+  for (const set of sortedSetList) {
     set.forEach(number => tuple.add(parseInt(number)));
   }
   
