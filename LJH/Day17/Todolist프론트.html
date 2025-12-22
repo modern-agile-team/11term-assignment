@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>Todo List</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .todo-app {
+      width: 420px;
+      background: #020617;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    h2 { text-align: center; margin-bottom: 16px; }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+    }
+
+    button.add {
+      padding: 0 16px;
+      font-size: 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: #22c55e;
+      font-weight: bold;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 16px;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 10px;
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+
+    li:hover { background: #1e293b; }
+
+    li.done span.text {
+      color: #94a3b8;
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+    }
+
+    span.text {
+      flex: 1;
+      user-select: none;
+    }
+
+    .icons span {
+      cursor: pointer;
+      margin-left: 6px;
+      transition: transform 0.15s;
+      user-select: none;
+    }
+
+    .icons span:hover {
+      transform: scale(1.3);
+    }
+
+    .edit-input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+    }
+
+    .ok-btn {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: #38bdf8;
+      font-weight: 700;
+    }
+
+    .cancel-btn {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: #64748b;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="todo-app">
+    <h2>Todo List</h2>
+
+    <div class="input-row">
+      <input id="todoInput" placeholder="할 일을 입력하세요" />
+      <button class="add" id="addBtn">+</button>
+    </div>
+
+    <ul id="todoList"></ul>
+  </div>
+
+<script>
+  let todos = [];
+  let idSeq = 1;
+  let editingId = null;
+
+  const input = document.getElementById("todoInput");
+  const list = document.getElementById("todoList");
+
+  function render() {
+    list.innerHTML = "";
+
+    todos.forEach(todo => {
+      const li = document.createElement("li");
+      li.dataset.id = String(todo.id);
+      if (todo.done) li.classList.add("done");
+
+      li.addEventListener("click", () => {
+        if (editingId === todo.id) return;
+        toggleTodo(todo.id);
+      });
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = todo.done;
+      checkbox.addEventListener("click", (e) => {
+        e.stopPropagation(); 
+        toggleTodo(todo.id);
+      });
+
+      // 문구
+      const text = document.createElement("span");
+      text.className = "text";
+      text.textContent = todo.text;
+
+      // 아이콘
+      const icons = document.createElement("div");
+      icons.className = "icons";
+
+      const edit = document.createElement("span");
+      edit.textContent = "✏️";
+      edit.className = "edit";
+      edit.addEventListener("click", (e) => {
+        e.stopPropagation(); 
+        startEdit(todo.id);
+      });
+
+      const del = document.createElement("span");
+      del.textContent = "🗑️";
+      del.addEventListener("click", (e) => {
+        e.stopPropagation(); 
+        deleteTodo(todo.id);
+      });
+
+      icons.append(edit, del);
+      li.append(checkbox, text, icons);
+      list.append(li);
+    });
+  }
+
+  function addTodo() {
+    const value = input.value.trim();
+    if (!value) {
+      alert("내용을 입력하세요.");
+      return;
+    }
+    todos.push({ id: idSeq++, text: value, done: false });
+    input.value = "";
+    render();
+  }
+
+  function toggleTodo(id) {
+    const todo = todos.find(t => t.id === id);
+    todo.done = !todo.done;
+    render();
+  }
+
+  function deleteTodo(id) {
+    if (editingId === id) editingId = null;
+    todos = todos.filter(t => t.id !== id);
+    render();
+  }
+
+  function startEdit(id) {
+    if (editingId !== null && editingId !== id) {
+      alert("다른 항목을 수정 중입니다. 먼저 완료/취소하세요.");
+      return;
+    }
+    editingId = id;
+
+    const li = [...list.children].find(el => Number(el.dataset.id) === id);
+    const todo = todos.find(t => t.id === id);
+    li.innerHTML = "";
+
+    const inputEdit = document.createElement("input");
+    inputEdit.className = "edit-input";
+    inputEdit.value = todo.text;
+    inputEdit.focus();
+
+    const ok = document.createElement("button");
+    ok.className = "ok-btn";
+    ok.textContent = "완료";
+    ok.addEventListener("click", (e) => {
+      e.stopPropagation();
+      finishEdit(id, inputEdit.value);
+    });
+
+    const cancel = document.createElement("button");
+    cancel.className = "cancel-btn";
+    cancel.textContent = "취소";
+    cancel.addEventListener("click", (e) => {
+      e.stopPropagation();
+      editingId = null;
+      render();
+    });
+
+    inputEdit.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") finishEdit(id, inputEdit.value);
+    });
+
+    li.append(inputEdit, ok, cancel);
+  }
+
+  function finishEdit(id, newText) {
+    if (!newText.trim()) {
+      alert("빈 값으로 수정할 수 없습니다.");
+      return;
+    }
+    const todo = todos.find(t => t.id === id);
+    todo.text = newText.trim();
+    editingId = null;
+    render();
+  }
+
+  document.getElementById("addBtn").addEventListener("click", addTodo);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") addTodo();
+  });
+
+  render();
+</script>
+</body>
+</html>
