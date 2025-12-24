@@ -7,11 +7,7 @@ function solution(s) {
             result += " ";
             idx = 0;
         } else {
-            if (idx % 2 === 0) {
-                result += ch.toUpperCase();
-            } else {
-                result += ch.toLowerCase();
-            }
+            result += idx % 2 === 0 ? ch.toUpperCase() : ch.toLowerCase();
             idx++;
         }
     }
