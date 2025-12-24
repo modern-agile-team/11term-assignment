@@ -1,4 +1,6 @@
 # Todo List (Full Stack)
+구동영상
+https://www.youtube.com/watch?v=k0lgP2H3RbQ
 
 ## 프로젝트 설명
 Express와 MySQL을 이용한 Todo List CRUD 웹 애플리케이션
@@ -21,3 +23,4 @@ Express와 MySQL을 이용한 Todo List CRUD 웹 애플리케이션
 ```bash
 npm install
 npm run dev
+
