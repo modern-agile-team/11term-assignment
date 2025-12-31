@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Document</title>
+    </head>
+    <body>
+        <h1>Soongu Calculator</h1>
+        <h3>계산식을 입력하여 주십시오(예시: 1 + 2 | 종료 : exit).</h3>
+        <div>* 소수점 둘쨰자리 까지 계산됩니다.</div>
+        <br />
+        <input type="text" id="inputValue" />
+        <button id="inputBtn">입력</button>
+        <br />
+        <div id="result"></div>
+        <script>
+            const inputElement = document.getElementById("inputValue");
+            const inputBtn = document.getElementById("inputBtn");
+            const resultDiv = document.getElementById("result");
+
+            function getRawInput() {
+                return inputElement.value.trim();
+            }
+
+            function parseInput(input) {
+                const parts = input
+                    .replace(/\s+/g, "")
+                    .match(/(\d+\.?\d*|[\+\-\*\/])/g);
+
+                if (!parts || parts.length < 3 || parts.length % 2 === 0)
+                    return null;
+
+                return parts;
+            }
+
+            function calculate(parts) {
+                let total = parseFloat(parts[0]);
+
+                for (let i = 1; i < parts.length; i += 2) {
+                    const operator = parts[i];
+                    const nextNum = parseFloat(parts[i + 1]);
+
+                    if (isNaN(nextNum)) return "ERROR_NAN";
+
+                    switch (operator) {
+                        case "+":
+                            total += nextNum;
+                            break;
+                        case "-":
+                            total -= nextNum;
+                            break;
+                        case "*":
+                            total *= nextNum;
+                            break;
+                        case "/":
+                            if (nextNum === 0) return "ERROR_DIV_ZERO";
+                            total /= nextNum;
+                            break;
+                        default:
+                            return "ERROR_OPERATOR";
+                    }
+                }
+                return total;
+            }
+
+            function formatResult(value) {
+                if (typeof value === "string") return value;
+                return Number.isInteger(value)
+                    ? value
+                    : Number(value.toFixed(2));
+            }
+
+            function printMessage(message) {
+                const errorMessages = {
+                    ERROR_NAN: "숫자 형식이 잘못되었습니다.",
+                    ERROR_DIV_ZERO: "0으로 나눌 수 없습니다.",
+                    ERROR_OPERATOR: "잘못된 연산자가 포함되어 있습니다.",
+                };
+
+                resultDiv.innerText = errorMessages[message] || `${message}`;
+            }
+
+            inputBtn.addEventListener("click", () => {
+                const rawInput = getRawInput();
+
+                if (rawInput.toLowerCase() === "exit") {
+                    printMessage("종료합니다.");
+                    return;
+                }
+
+                const parts = parseInput(rawInput);
+                if (!parts) {
+                    printMessage("올바른 수식을 입력하세요 (예: 1 + 2 - 3)");
+                    return;
+                }
+
+                const rawResult = calculate(parts);
+                const finalResult = formatResult(rawResult);
+
+                printMessage(finalResult);
+            });
+        </script>
+    </body>
+</html>

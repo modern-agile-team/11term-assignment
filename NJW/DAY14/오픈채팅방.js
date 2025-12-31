@@ -3,10 +3,7 @@ function solution(record) {
     let user_db = {};
 
     for (const r of record) {
-        const word = r.split(" ");
-        const cmd = word[0];
-        const uid = word[1];
-        const nickname = word[2];
+        const [cmd, uid, nickname] = r.split(" ");
         if (cmd === "Enter" || cmd === "Change") {
             user_db[uid] = nickname;
         }
