@@ -35,11 +35,7 @@ class Todo {
     try {
       const result = await TodoStorage.updateTodo(client);
 
-      if (result.success) {
-        return { success: true, status: 200, data: result };
-      } else {
-        return { success: false, status: 500, msg: err };
-      }
+      return { success: true, status: 200, data: result };
     } catch (err) {
       return { success: false, status: 500, msg: err };
     }
@@ -51,11 +47,7 @@ class Todo {
     try {
       const result = await TodoStorage.completeTodo(client);
 
-      if (result.success) {
-        return { success: true, status: 200, data: result };
-      } else {
-        return { success: false, status: 500, msg: err };
-      }
+      return { success: true, status: 200, data: result };
     } catch (err) {
       return { success: false, status: 500, msg: err };
     }
@@ -67,11 +59,7 @@ class Todo {
     try {
       const result = await TodoStorage.deleteTodo(client.id);
 
-      if (result.success) {
-        return { success: true, status: 200, data: result };
-      } else {
-        return { success: false, status: 500, msg: err };
-      }
+      return { success: true, status: 200, data: result };
     } catch (err) {
       return { success: false, status: 500, msg: err };
     }
