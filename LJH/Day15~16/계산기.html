@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>계산기</title>
+  <style>
+    :root {
+      --bg1: #1f2933;
+      --bg2: #111827;
+      --card: #0f172a;
+      --panel: #020617;
+      --btn: #1e293b;
+      --btnHover: #334155;
+      --accent: #0ea5e9;
+      --ok1: #22c55e;
+      --ok2: #16a34a;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --result: #a7f3d0;
+      --input: #38bdf8;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      padding: 24px;
+      color: var(--text);
+    }
+
+    .wrap {
+      position: relative;
+      width: 360px;
+      max-width: 92vw;
+      background: var(--card);
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    
+    }
+    .student {
+      position: absolute;
+      top: 9px;
+      right: 20px;
+      font-size: 12px;
+      color: #acc1dd;
+      letter-spacing: 0.3px;
+    }
+
+
+    h2 {
+      text-align: center;
+      margin: 6px 0 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .hint {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+      margin-bottom: 13px;
+      white-space: pre-line;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 14px;
+      font-size: 20px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      background: var(--panel);
+      color: var(--input);
+      box-sizing: border-box;
+      text-align: right;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      padding: 14px;
+      font-size: 18px;
+      border-radius: 14px;
+      border: none;
+      background: var(--btn);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      user-select: none;
+    }
+
+    button:hover { background: var(--btnHover); }
+    button:active { transform: scale(0.95); }
+
+    button[data-k="+"],
+    button[data-k="-"],
+    button[data-k="*"],
+    button[data-k="/"] {
+      background: var(--accent);
+      color: #001018;
+      font-weight: 700;
+    }
+
+    #equals {
+      background: linear-gradient(135deg, var(--ok1), var(--ok2));
+      font-weight: 800;
+      color: #02150b;
+    }
+
+    #clear {
+      background: #ef4444;
+      color: #1b0202;
+      font-weight: 800;
+    }
+
+    #back { font-weight: 800; }
+
+    .result {
+      margin-top: 16px;
+      padding: 14px;
+      border-radius: 12px;
+      background: var(--panel);
+      color: var(--result);
+      font-size: 20px;
+      text-align: right;
+      min-height: 32px;
+      white-space: pre-line;
+    }
+
+    button:disabled,
+    input:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      filter: grayscale(0.2);
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="student">2025001424 이재혁</div>
+  <h2>계산기</h2>
+    <div class="hint" id="hint">
+입력 형식: 숫자 연산자 숫자 (ex: 3+5, 12/4)
+Enter 또는 '='로 계산, 종료하려면 exit 입력
+    </div>
+
+    <input id="expr" placeholder="예: 3+5 또는 3 + 5 (exit 입력 시 종료)" autocomplete="off" />
+
+    <div class="row">
+      <button data-k="7">7</button><button data-k="8">8</button><button data-k="9">9</button><button data-k="/">/</button>
+      <button data-k="4">4</button><button data-k="5">5</button><button data-k="6">6</button><button data-k="*">*</button>
+      <button data-k="1">1</button><button data-k="2">2</button><button data-k="3">3</button><button data-k="-">-</button>
+      <button data-k="0">0</button><button data-k=".">.</button><button id="clear">C</button><button data-k="+">+</button>
+      <button id="back">←</button><button id="equals" style="grid-column: span 3;">=</button>
+    </div>
+
+    <div class="result" id="out"></div>
+  </div>
+
+  <script>
+    function $(id) { return document.getElementById(id); }
+    function setOutput(msg) { $("out").textContent = msg; }
+    function getInputValue() { return $("expr").value; }
+    function setInputValue(v) { $("expr").value = v; }
+    function isExitCommand(raw) { return raw.trim().toLowerCase() === "exit"; }
+    function normalizeExpression(raw) { return raw.replace(/\s+/g, ""); }
+
+    function parseExpression(expr) {
+      const m = expr.match(/^(-?\d+(?:\.\d+)?)([+\-*/])(-?\d+(?:\.\d+)?)$/);
+      return m ? { a: Number(m[1]), op: m[2], b: Number(m[3]) } : null;
+    }
+
+    function calc(a, op, b) {
+      if (op === "+") return a + b;
+      if (op === "-") return a - b;
+      if (op === "*") return a * b;
+      if (op === "/") return b === 0 ? NaN : a / b;
+      return NaN;
+    }
+
+    function formatResult(value) {
+      if (Number.isNaN(value)) return "에러: 잘못된 수식(또는 0으로 나눔)";
+      return String(value);
+    }
+
+    function terminateProgram() {
+      setOutput("프로그램이 종료되었습니다.");
+      $("expr").disabled = true;
+
+      document.querySelectorAll("button").forEach(btn => {
+        btn.disabled = true;
+      });
+    }
+
+    function evaluateCurrentInput() {
+      const raw = getInputValue();
+      if (isExitCommand(raw)) { terminateProgram(); return; }
+
+      const expr = normalizeExpression(raw);
+      const parsed = parseExpression(expr);
+      if (!parsed) {
+        setOutput("형식: 숫자 연산자 숫자 (예: 12/3)\n종료: exit");
+        return;
+      }
+      setOutput(formatResult(calc(parsed.a, parsed.op, parsed.b)));
+    }
+
+    function appendKey(k) { setInputValue(getInputValue() + k); }
+
+    function backspace() {
+      const v = getInputValue();
+      setInputValue(v.slice(0, Math.max(0, v.length - 1)));
+    }
+
+    function clearAll() {
+      if ($("expr").disabled) return;
+      setInputValue("");
+      setOutput("");
+    }
+
+    function onButtonClick(e) {
+      const k = e.target.getAttribute("data-k");
+      if (k) appendKey(k);
+    }
+
+    function bindUI() {
+      document.querySelector(".row").addEventListener("click", onButtonClick);
+      $("equals").addEventListener("click", evaluateCurrentInput);
+      $("clear").addEventListener("click", clearAll);
+      $("back").addEventListener("click", backspace);
+
+      $("expr").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") evaluateCurrentInput();
+      });
+
+    
+      $("expr").addEventListener("input", () => {
+        if (isExitCommand(getInputValue())) terminateProgram();
+      });
+    }
+
+    function main() {
+      bindUI();
+      setOutput("수식 입력후 Enter 또는 '=' 을 입력");
+      $("expr").focus();
+    }
+
+    main();
+  </script>
+</body>
+</html>

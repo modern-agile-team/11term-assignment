@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <title>Todo List</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .todo-app {
+      width: 420px;
+      background: #020617;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    h2 { text-align: center; margin-bottom: 16px; }
+
+    .input-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+    }
+
+    button.add {
+      padding: 0 16px;
+      font-size: 20px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: #22c55e;
+      font-weight: bold;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 16px;
+    }
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 10px;
+      transition: background 0.15s;
+      cursor: pointer;
+    }
+
+    li:hover { background: #1e293b; }
+
+    li.done span.text {
+      color: #94a3b8;
+      text-decoration: line-through;
+      text-decoration-thickness: 2px;
+    }
+
+    span.text {
+      flex: 1;
+      user-select: none;
+    }
+
+    .icons span {
+      cursor: pointer;
+      margin-left: 6px;
+      transition: transform 0.15s;
+      user-select: none;
+    }
+
+    .icons span:hover {
+      transform: scale(1.3);
+    }
+
+    .edit-input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+    }
+
+    .ok-btn {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: #38bdf8;
+      font-weight: 700;
+    }
+
+    .cancel-btn {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background: #64748b;
+      font-weight: 700;
+      margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="todo-app">
+    <h2>Todo List</h2>
+
+    <div class="input-row">
+      <input id="todoInput" placeholder="할 일을 입력하세요" />
+      <button class="add" id="addBtn">+</button>
+    </div>
+
+    <ul id="todoList"></ul>
+  </div>
+
+<script>
+  // ====== API 설정 ======
+  const API_BASE = "http://localhost:3000";
+
+  async function api(path, options = {}) {
+    const res = await fetch(API_BASE + path, {
+      headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+      ...options,
+    });
+
+    // 서버가 에러를 JSON으로 주든, 텍스트로 주든 안전하게 처리
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      throw new Error(text || `HTTP ${res.status}`);
+    }
+
+    const contentType = res.headers.get("content-type") || "";
+    if (contentType.includes("application/json")) return res.json();
+    return null;
+  }
+
+  // ====== 상태 ======
+  let todos = [];           
+  let editingId = null;
+
+  const input = document.getElementById("todoInput");
+  const list = document.getElementById("todoList");
+
+  // ====== 서버 -> 화면 ======
+  function render() {
+    list.innerHTML = "";
+
+    todos.forEach((todo) => {
+      const li = document.createElement("li");
+      li.dataset.id = String(todo.id);
+      if (todo.done) li.classList.add("done");
+
+      li.addEventListener("click", () => {
+        if (editingId === todo.id) return; 
+        toggleTodo(todo.id);
+      });
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = todo.done;
+      checkbox.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleTodo(todo.id);
+      });
+
+      const text = document.createElement("span");
+      text.className = "text";
+      text.textContent = todo.text;
+
+      const icons = document.createElement("div");
+      icons.className = "icons";
+
+      const edit = document.createElement("span");
+      edit.textContent = "✏️";
+      edit.className = "edit";
+      if (todo.done) edit.style.display = "none";
+      edit.addEventListener("click", (e) => {
+        e.stopPropagation();
+        startEdit(todo.id);
+      });
+
+      const del = document.createElement("span");
+      del.textContent = "🗑️";
+      del.addEventListener("click", (e) => {
+        e.stopPropagation();
+        deleteTodo(todo.id);
+      });
+
+      icons.append(edit, del);
+      li.append(checkbox, text, icons);
+      list.append(li);
+    });
+  }
+  // GET /todos
+  async function loadTodos() {
+    // 백엔드 응답: [{ id, description, is_check, in_date }, ...]
+    const rows = await api("/todos");
+    todos = rows.map((r) => ({
+      id: r.id,
+      text: r.description,
+      done: Number(r.is_check) === 1,
+      in_date: r.in_date,
+    }));
+    render();
+  }
+
+  // POST /todos
+  async function addTodo() {
+    const value = input.value.trim();
+    if (!value) {
+      alert("내용을 입력하세요.");
+      return;
+    }
+
+    // 서버에 생성 요청
+    await api("/todos", {
+      method: "POST",
+      body: JSON.stringify({ description: value }),
+    });
+
+    input.value = "";
+    await loadTodos();
+  }
+
+  // PATCH /todos/:id
+  async function toggleTodo(id) {
+    const todo = todos.find((t) => t.id === id);
+    if (!todo) return;
+
+    // 완료/미완료
+    const next = todo.done ? 0 : 1;
+
+    await api(`/todos/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ is_check: next }),
+    });
+
+    await loadTodos();
+  }
+
+  // DELETE /todos/:id
+  async function deleteTodo(id) {
+    if (editingId === id) editingId = null;
+
+    await api(`/todos/${id}`, { method: "DELETE" });
+    await loadTodos();
+  }
+
+  // 수정 시작
+  function startEdit(id) {
+    const todo = todos.find((t) => t.id === id);
+    if (!todo) return;
+
+    if (todo.done) {
+      alert("완료된 항목은 수정할 수 없습니다.");
+      return;
+    }
+
+    if (editingId !== null && editingId !== id) {
+      alert("다른 항목을 수정 중입니다. 먼저 완료/취소하세요.");
+      return;
+    }
+    editingId = id;
+
+    const li = [...list.children].find((el) => Number(el.dataset.id) === id);
+    li.innerHTML = "";
+
+    const inputEdit = document.createElement("input");
+    inputEdit.className = "edit-input";
+    inputEdit.value = todo.text;
+    inputEdit.focus();
+
+    const ok = document.createElement("button");
+    ok.className = "ok-btn";
+    ok.textContent = "완료";
+    ok.addEventListener("click", (e) => {
+      e.stopPropagation();
+      finishEdit(id, inputEdit.value);
+    });
+
+    const cancel = document.createElement("button");
+    cancel.className = "cancel-btn";
+    cancel.textContent = "취소";
+    cancel.addEventListener("click", (e) => {
+      e.stopPropagation();
+      editingId = null;
+      render();
+    });
+
+    inputEdit.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") finishEdit(id, inputEdit.value);
+    });
+
+    li.append(inputEdit, ok, cancel);
+  }
+
+  // PATCH /todos/:id (내용 수정)
+  async function finishEdit(id, newText) {
+    const v = (newText || "").trim();
+    if (!v) {
+      alert("빈 값으로 수정할 수 없습니다.");
+      return;
+    }
+
+    await api(`/todos/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ description: v }),
+    });
+
+    editingId = null;
+    await loadTodos();
+  }
+
+  // 이벤트 바인딩
+  document.getElementById("addBtn").addEventListener("click", addTodo);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") addTodo();
+  });
+
+  // 시작
+  (async function main() {
+    try {
+      await loadTodos();
+    } catch (e) {
+      console.error(e);
+      alert(
+        "서버 연결 실패!\n" +
+        "1) 백엔드가 실행 중인지 확인 (npm run dev)\n" +
+        "2) 주소가 http://localhost:3000 인지 확인\n\n" +
+        "에러: " + e.message
+      );
+    }
+  })();
+</script>
+</body>
+</html>
