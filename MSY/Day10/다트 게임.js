@@ -1,26 +1,39 @@
 function solution(dartResult) {
-    const charConv = {'S':'**1', 'D':'**2', 'T':'**3', '#':'*-1'};
-    const result = [];
-    
-    const parser = dartResult.match(/\d{1,2}[SDT][*#]?/g);
+  const scores = [];
+  let i = 0;
 
-    for (let parse of parser) {
-        const origin = parse;
-    
-        parse = parse.replace(/[SDT#]/g, (ch) => charConv[ch]);
-        
-        if (origin.includes('*')) {
-            parse = parse.slice(0, -1);
-            parse += '*2';
-            if (result.length > 0) {
-                result[result.length - 1] = 
-                    '(' + result[result.length - 1].slice(0, -1) + ')*2+';
-            }
-        }
-    
-        parse += '+' ; 
-        result.push(parse);
+  while (i < dartResult.length) {
+    let num = 0;
+
+    if (dartResult[i] === '1' && dartResult[i + 1] === '0') {
+      num = 10;
+      i += 2;
+    } else {
+      num = Number(dartResult[i]);
+      i += 1;
     }
 
-    return eval (result.join("").slice(0, -1));
+    const bonus = dartResult[i];
+    i += 1;
+
+    if (bonus === 'S') num = num ** 1;
+    else if (bonus === 'D') num = num ** 2;
+    else if (bonus === 'T') num = num ** 3;
+
+    if (dartResult[i] === '*' || dartResult[i] === '#') {
+      const option = dartResult[i];
+      i += 1;
+
+      if (option === '*') {
+        num *= 2;
+        if (scores.length > 0) scores[scores.length - 1] *= 2;
+      } else if (option === '#') {
+        num *= -1;
+      }
+    }
+
+    scores.push(num);
+  }
+
+  return scores.reduce((sum, v) => sum + v, 0);
 }
