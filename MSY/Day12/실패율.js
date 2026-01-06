@@ -16,11 +16,8 @@ function solution(N, stages) {
   }
 
   let dicSort = Object.entries(dic).sort((a, b) => b[1] - a[1]);
-
-  let result = [];
-  for (let i = 0; i < dicSort.length; i++) {
-    result.push(Number(dicSort[i][0]));
-  }
+  
+  let result = dicSort.map(([stage]) => Number(stage));
 
   return result;
 }
