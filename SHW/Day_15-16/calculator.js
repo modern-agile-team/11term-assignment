@@ -42,7 +42,8 @@ function isValidExpression(expression) {
 // 계산을 수행하는 함수
 function performCalculation(expression) {
     try {
-        const result = eval(expression);
+        const calculate = new Function('return ' + expression);
+        const result = calculate();
         return result;
     } catch (error) {
         throw new Error('Invalid expression');
