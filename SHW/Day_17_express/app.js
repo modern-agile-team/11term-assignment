@@ -55,7 +55,7 @@ app.put("/todos/:id", async (req, res) => {
         const {id} = req.params;
         const {content} = req.body;
 
-        const [todos] = await pool.quert("SELECT * FROM todos WHERE id = ?", [id]);
+        const [todos] = await pool.query("SELECT * FROM todos WHERE id = ?", [id]);
 
         if(todos.length === 0) {
             return res.status(404).json({error: "할 일을 찾을 수 없습니다."});

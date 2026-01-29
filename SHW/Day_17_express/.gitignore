@@ -8,6 +8,9 @@ node_modules/
 *.log
 npm-debug.log*
 
+# 설명 파일
+code_review.md
+
 # OS 생성 파일
 .DS_Store
 Thumbs.db
