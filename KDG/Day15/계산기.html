@@ -9,73 +9,8 @@
     <div><h3>계산식을 입력해 주십시오(예시 : 1+2 | 종료 : exit).</h3></div>
     <div><ul><li>소수점 둘째자리 까지 계산됩니다.</li></ul></div>
     <input type = "text" id = "in-text" />
-    <input type="button" id="in-btn" value="버튼" />
-
-<script>
-function getElement(id){
-    return document.getElementById(id);
-}
-const inbtn = getElement("in-btn");
-const intext = () => getElement("in-text").value;
-
-
-const click = () => {
-    const userInput = intext();
-    const result = calculate(userInput);
-    print(result);
-}
-const exit = () => alert("계산기를 종료합니다.");
-
-const exitcheck = (exit) => (exit === "exit" ) ? true : false;
-function calculate(userInput) {
-    let result;
-    let n1,n2;
-[n1, n2] = userInput.split(/[\+\-\*\/]/).map(Number);
-    switch (true){
-        case userInput.includes("+"): 
-            result = add(n1, n2);
-            break;
-       case userInput.includes("-"):
-            result = minus(n1, n2);
-            break;
-        case userInput.includes("*"):
-            result = multipl(n1, n2);
-            break;
-        case userInput.includes("/"):
-            result = division(n1, n2);
-            break;
-        case exitcheck(userInput):
-            exit();
-            break;
-            
-    }
-    return result;
-
-}
-inbtn.onclick = click;
-
-const add = (n1, n2) => n1 + n2;
-const minus = (n1, n2) => n1 - n2;
-const multipl = (n1, n2) => n1 * n2;
-const division = (n1, n2) => n2 === 0 ? "Error" : n1 / n2;
-const A4 = () =>  getElement("in-text");
-
-const print = (ingcle) => {
-    ingcle === "Error" ? alert("0으로 나눌 수 없습니다") :
-    A4().value = Number(ingcle).toFixed(2);
-    
-    
-
-    
-}
-    
-        
-
- 
-
-
-
-
-</script>
+    <input type = "button" id="in-btn" value="버튼" />
+    <span id = "result-display"></span>
+    <script src="계산기.js"></script>
 </body>
 </html>
